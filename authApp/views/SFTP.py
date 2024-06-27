@@ -20,7 +20,7 @@ class SFTPFileList(APIView):
             # Configura la conexión SFTP
             ssh = paramiko.SSHClient()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh.connect('192.168.0.220', 8040, 'rafael_upc', 'rafael0321')
+            ssh.connect('192.168.0.220', 22, 'rafael_upc', 'rafael0321')
 
             sftp = ssh.open_sftp()
 
@@ -41,7 +41,7 @@ class SFTPFileList(APIView):
                 # Configura la conexión SFTP
                 ssh = paramiko.SSHClient()
                 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                ssh.connect('192.168.0.220', 8040, 'rafael_upc', 'rafael0321')
+                ssh.connect('192.168.0.220', 22, 'rafael_upc', 'rafael0321')
 
                 sftp = ssh.open_sftp()
 
@@ -81,7 +81,7 @@ class SFTPFileList(APIView):
         try:
             ssh = paramiko.SSHClient()
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh.connect('192.168.0.220', 8040, 'rafael_upc', 'rafael0321')
+            ssh.connect('192.168.0.220', 22, 'rafael_upc', 'rafael0321')
 
             sftp = ssh.open_sftp()
 

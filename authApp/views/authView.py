@@ -36,13 +36,7 @@ class Login(TokenObtainPairView):
                         'user': user_serializer.data,
                         'message': 'Inicio de sesión exitoso.'
                     }
-                    response = JsonResponse(data, status=status.HTTP_200_OK, encoder=DjangoJSONEncoder)
-                    response.set_cookie('token_cookie_access', data['access'], httponly=True,
-                                        max_age=int(settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'].total_seconds()),
-                                        secure=True, samesite='Strict')
-                    response.set_cookie('token_cookie_refresh', data['refresh'], httponly=True,
-                                        max_age=int(settings.SIMPLE_JWT['REFRESH_TOKEN_LIFETIME'].total_seconds()),
-                                        secure=True, samesite='Strict')
+                    response = JsonResponse(data, status=status.HTTP_200_OK)
                     return response
             else:
                 return Response({'error': 'Contraseña incorrecta.'},
