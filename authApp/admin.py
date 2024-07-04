@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.contrib.sessions.models import Session
+from django.contrib.auth.models import User
 from .models import User
 from .models import Role
 from .models import Contrato
@@ -13,6 +15,23 @@ from .models import Servidor
 admin.site.site_header = 'Administración de Django - Contratos App'
 # admin.site.site_title = 'Contratos'
 admin.site.index_title = 'Bienvenido al sitio administrativo'
+
+
+@admin.register(Session)
+class SessionAdmin(admin.ModelAdmin):
+    list_display = ['session_key', 'username', 'expire_date']
+
+    def username(self, obj):
+        session_data = obj.get_decoded()
+        user_id = session_data.get('_auth_user_id')
+        if user_id:
+            try:
+                user = User.objects.get(pk=user_id)
+                return user.username
+            except User.DoesNotExist:
+                return '(usuario no encontrado)'
+        return '(no autenticado)'
+    username.short_description = 'Usuario'
 
 
 class UserAdmin(admin.ModelAdmin):

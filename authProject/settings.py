@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-1$_j1%-m5k8gc^ksuka0)%+_u_uqg9f=(8obiz83kg=sxcr7^w'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
-    # 'rest_framework_simplejwt.token_blacklist',
+    'rest_framework_simplejwt.token_blacklist',
     'authApp',
     'corsheaders',
 ]
@@ -76,11 +76,13 @@ REST_FRAMEWORK = {
 
 AUTH_USER_MODEL = 'authApp.User'
 
+SESSION_COOKIE_AGE = 3600*10
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=10),
     'REFRESH_TOKEN_LIFETIME': timedelta(hours=10),
     'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': False,
+    'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': True,
 
     'ALGORITHM': 'HS256',

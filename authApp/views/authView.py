@@ -1,6 +1,5 @@
 from django.contrib.auth import authenticate
 from django.contrib.sessions.models import Session
-from django.core.serializers.json import DjangoJSONEncoder
 from django.http import JsonResponse
 from django.utils import timezone
 from rest_framework import status
@@ -9,7 +8,8 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from authApp.serializers.userSerializer import CustomTokenObtainPairSerializer, CustomLoginUserSerializer
 from authApp.models.user import User
-from authProject import settings
+from django.contrib.auth import login
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 class Login(TokenObtainPairView):
@@ -27,9 +27,17 @@ class Login(TokenObtainPairView):
         if user.is_active:
             user = authenticate(username=username, password=password)
             if user:
+                sessions = Session.objects.filter(expire_date__gte=timezone.now())
+                user_has_active_session = any(
+                    session.get_decoded().get('_auth_user_id') == str(user.id) for session in sessions)
+
+                if user_has_active_session:
+                    return Response({'message': 'El usuario ya tiene una sesión activa. Cierre la otra sesión para continuar.'}, status=status.HTTP_200_OK)
+
                 login_serializer = self.serializer_class(data=request.data)
                 if login_serializer.is_valid():
                     user_serializer = CustomLoginUserSerializer(user)
+                    login(request, user)
                     data = {
                         'access': login_serializer.validated_data.get('access'),
                         'refresh': login_serializer.validated_data.get('refresh'),
@@ -54,6 +62,9 @@ class Logout(GenericAPIView):
             if not refresh:
                 return Response({'error': 'Refresh token no proporcionado.'}, status=status.HTTP_400_BAD_REQUEST)
             try:
+                token = RefreshToken(refresh)
+                token.blacklist()
+
                 sessions = Session.objects.filter(expire_date__gte=timezone.now())
                 for session in sessions:
                     data = session.get_decoded()
@@ -61,5 +72,11 @@ class Logout(GenericAPIView):
                         session.delete()
                 return Response({'message': 'Sesión cerrada correctamente.'}, status=status.HTTP_200_OK)
             except Exception as e:
-                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                sessions = Session.objects.filter(expire_date__gte=timezone.now())
+                for session in sessions:
+                    data = session.get_decoded()
+                    if data.get('_auth_user_id') == str(user.id):
+                        session.delete()
+                print(str(e))
+                return Response({'message': 'Sesión cerrada correctamente.'}, status=status.HTTP_200_OK)
         return Response({'error': 'No existe este usuario.'}, status=status.HTTP_400_BAD_REQUEST)

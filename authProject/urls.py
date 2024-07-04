@@ -27,7 +27,7 @@ urlpatterns = [
     path('admin/', admin.site.urls, name='admin'),
     path('login/', views.Login.as_view(), name='login'),
     path('refresh/', TokenRefreshView.as_view()),
-    # path('logout/', views.Logout.as_view(), name='logout'),
+    path('logout/', views.Logout.as_view(), name='logout'),
     path('users/', views.UserView.as_view()),
     path('users/<int:pk>/', views.UserView.as_view()),
     path('users/username/<str:username>/', views.UserView.as_view()),
